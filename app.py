@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI,OpenAIEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -28,7 +28,7 @@ if not (OPENAI_API_KEY and PINECONE_API_KEY and PINECONE_ENVIRONMENT):
 
 # Initialize Pinecone and embeddings
 pc = Pinecone(api_key=PINECONE_API_KEY)
-embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2')
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 index = pc.Index(INDEX_NAME)
 
 bm25_encoder = BM25Encoder().load("all_bm25_value.json")  # Update path to BM25 file
