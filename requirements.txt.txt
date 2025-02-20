@@ -1,0 +1,17 @@
+flask
+langchain
+langchain-openai
+langchain-core
+langchain-community
+pinecone-client
+dotenv
+sentence-transformers
+pinecone-text
+warnings
+traceback
+logging
+pandas
+os
+time
+re
+pymssql
