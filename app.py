@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -31,7 +31,7 @@ if not (OPENAI_API_KEY and PINECONE_API_KEY and PINECONE_ENVIRONMENT):
 
 # Initialize Pinecone and embeddings
 pc = Pinecone(api_key=PINECONE_API_KEY)
-embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2')
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 index = pc.Index(INDEX_NAME)
 
 bm25_encoder = BM25Encoder().load("all_bm25_value.json")  # Update path to BM25 file
@@ -57,8 +57,7 @@ Provide the best companies that fit the criteria outlined in the question above,
 
     after_rag_prompt = ChatPromptTemplate.from_template(prompt_template)
     llm = ChatXAI(xai_api_key=GROK_API_KEY, # type: ignore
-    model="grok-2-latest",
-)
+    model="grok-2-latest",)
     def hyde_retriever(query):
         return vectorstore.get_relevant_documents(query)
 
