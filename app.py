@@ -24,7 +24,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GROK_API_KEY = os.getenv("GROK_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
-INDEX_NAME = "test-new"
+INDEX_NAME = "openmill-ai"
 
 if not (OPENAI_API_KEY and PINECONE_API_KEY and PINECONE_ENVIRONMENT):
     raise EnvironmentError("Please set OPENAI_API_KEY, PINECONE_API_KEY, and PINECONE_ENVIRONMENT as environment variables.")

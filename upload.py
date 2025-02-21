@@ -3,7 +3,7 @@ import logging
 from pinecone import Pinecone, ServerlessSpec
 from pinecone_text.sparse import BM25Encoder
 from langchain_community.retrievers import PineconeHybridSearchRetriever
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
 import pandas as pd
 import os
 import time
@@ -47,7 +47,7 @@ def embed_documents_in_pinecone(chunks, metadata, index_name):
         if index_name not in existing_indexes:
             pc.create_index(
                 name=index_name,
-                dimension=768,
+                dimension=1536,
                 metric="dotproduct",
                 spec=ServerlessSpec(cloud="aws", region="us-east-1"),
             )
@@ -56,7 +56,7 @@ def embed_documents_in_pinecone(chunks, metadata, index_name):
 
         bm25_encoder = BM25Encoder().load("all_bm25_value.json")
         index = pc.Index(index_name)
-        embeder = HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2')
+        embeder = OpenAIEmbeddings(model="text-embedding-3-small")
 
         vectorstore = PineconeHybridSearchRetriever(
             embeddings=embeder, sparse_encoder=bm25_encoder, index=index, top_k=10
@@ -68,6 +68,7 @@ def embed_documents_in_pinecone(chunks, metadata, index_name):
             logging.info("Chunks added successfully.")
         except Exception as e:
             logging.error(f"An error occurred while adding texts to Pinecone: {str(e)}")
+            print(e)
             return None  # Return None if there was an error during addition
 
         # Update embedding status
@@ -77,6 +78,7 @@ def embed_documents_in_pinecone(chunks, metadata, index_name):
 
     except Exception as e:
         logging.error(f"Pinecone embedding error: {e}")
+        print(e)
         logging.error(traceback.format_exc())
         return None
 
@@ -133,17 +135,17 @@ def main():
         try:
             logging.info("Starting document processing...")
             cleaned_texts, contact_location_list = process_database()
-            
+            print(len(cleaned_texts), len(contact_location_list))
             if cleaned_texts and contact_location_list:
-                embed_result = embed_documents_in_pinecone(cleaned_texts, contact_location_list, "test-new")
-                
+                embed_result = embed_documents_in_pinecone(cleaned_texts, contact_location_list, "openmill-ai")
+                print(embed_result)
                 if embed_result:
                     logging.info("Embedding completed successfully.")
                 else:
                     logging.warning("Embedding process encountered issues.")
             
             logging.info("Waiting for next processing cycle...")
-            time.sleep(120)  # Wait a minute before retrying
+            time.sleep(3600)  # Wait a minute before retrying
 
         except Exception as e:
             logging.error(f"Unexpected error in main loop: {e}")
